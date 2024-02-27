@@ -1,0 +1,48 @@
+use('estoque')
+
+// Exemplo de insert
+
+db.produtos.insertOne({
+    "codBarras": "7982137981273",
+    "nome": "Arroz Agulhinha",
+    "preco": 26.90
+})
+
+// Exemplo de select
+// SELECT * from Produtos
+use('estoque')
+db.produtos.find()
+
+// Exemplo com insertMany
+
+use('estoque')
+db.produtos.insertMany([
+    {
+        "codBarras": "7567137984857",
+        "nome": "Arroz Parbolizado",
+        "preco": 32.90
+    },
+    {
+        "codBarras": "8943278294567",
+        "nome": "Feijao Preto 🍛",
+        "preco": 17.00
+    },
+])
+
+// SELECT nome, preco from Produtos
+use('estoque')
+db.produtos.find({},{_id:0, nome:1, preco:1})
+
+// Select codbarras, nome from produtos
+// where codbarras = '8943278294567'
+
+use('estoque')
+db.produtos.find({codBarras: '8943278294567'},
+    {_id:0, codBarras:1, nome:1})
+
+// SELECT codbarras, nome from Produtos
+// where nome like '%Arroz%'
+
+use('estoque')
+db.produtos.find({nome: /arroz/i},
+                 {_id:0, codBarras:1, nome:1})
