@@ -39,18 +39,35 @@ db.restaurantes.find({ bairro: /bronx/i }, {}).skip(5).limit(5)
 // 8. Defina a query NoSQL para exibir todos os restaurantes que obtiveram uma avaliação maior que 90 pontos.
 
 use('DadosGeo')
-db.restaurantes.find({ 'avaliações.pontos': { $gte: 90 } }, {})
+
+// db.restaurantes.find({ 'avaliações.pontos': { $gte: 90 } }, {})
+
+db.restaurantes.find({ avaliações: 
+                        {$elemMatch: 
+                          {'pontos':{ $gte: 90 }}
+                        } 
+                      }, {_id: 0, nome: 1, 'avaliações.$': 1})
+
+// ***.$ faz analisar a regra imposta e apresenta o primeiro elemento que coincide com ela ***
 
 // 9. Defina a query NoSQL para exibir todos os restaurantes que obtiveram uma avaliação maior que 80 e menor que 100.
 
 use('DadosGeo')
-db.restaurantes.find({
-  $and: [
-    { 'avaliações.pontos': { $lte: 100 } },
-    { 'avaliações.pontos': { $gte: 80 } }
-  ]
-}
-)
+
+// db.restaurantes.find({
+//   $and: [
+//     { 'avaliações.pontos': { $lte: 100 } },
+//     { 'avaliações.pontos': { $gte: 80 } }
+//   ]
+// }
+// )
+
+db.restaurantes.find({ avaliações: {
+  $elemMatch: {
+    'pontos': {$lte: 100, $gte: 80 }
+  }
+}},
+{_id: 0, nome: 1, 'avaliações.$': 1})
 
 // 10. Defina a query NoSQL para exibir todos os restaurantes que estão localizados em uma latitude menor que -95.754168.
 
@@ -62,20 +79,20 @@ db.restaurantes.find({ 'endereço.coord.0': { $lte: - 95.754168 } })
 use('DadosGeo')
 db.restaurantes.find({
   $and: [
-    { cozinha: { $not: /american/i } },
+    { cozinha: { $nin: [/american/i, /american /i ] } },
     { 'avaliações.pontos': { $gte: 70 } },
     { 'endereço.coord.0': { $lte: -65.754168 } }
   ]
-}, {})
+}, {_id: 0, nome: 1, cozinha: 1, 'avaliações.pontos': 1})
 
 // 12. Defina a query NoSQL para exibir todos os restaurantes que não são da cozinha 'American', que tenham pelo menos 70 pontos de avaliação e que a latitude seja menor que - 65.754168. (Não utilize o operador $and para esta query)
 
 use('DadosGeo')
 db.restaurantes.find({
-  cozinha: { $not: /american/i },
+  cozinha: { $nin: [/american/i, /american /i] },
   'avaliações.pontos': { $gte: 70 },
   'endereço.coord.0': { $lte: -65.754168 }
-}, {})
+}, { _id: 0, nome: 1, cozinha: 1, 'avaliações.pontos': 1 })
 
 // 13. Defina a query NoSQL para exibir todos os restaurantes que não são da cozinha 'American', e obtiveram uma nota 'A' na avaliação e que não pertencem ao bairro Brooklyn.Exibir a consulta ordenada por cozinha em ordem descendente.
 
@@ -87,7 +104,7 @@ db.restaurantes.find({
     { bairro: { $not: /Brooklyn/i } }
   ]
 }, {}
-).sort({ cozinha: 1 })
+).sort({ cozinha: -1 })
 
 // 14. Defina a query NoSQL para exibir o Id, nome, bairro e cozinha dos restaurantes cujo nome comecem com o texto Wil.Dica: /^ /
 
@@ -117,7 +134,7 @@ db.restaurantes.find({
       { cozinha: { $regex: /american/i } },
       { cozinha: { $regex: /chinese/i } }
     ]
-})
+}, {nome: 1, bairro: 1, cozinha: 1} )
 
 // 18. Defina a query NoSQL para exibir o Id, nome, bairro e cozinha de todos os restaurantes que estão em um dos seguintes bairros: Staten Island, Queens, Bronx ou Brooklyn. (utilize o operador $in)
 
