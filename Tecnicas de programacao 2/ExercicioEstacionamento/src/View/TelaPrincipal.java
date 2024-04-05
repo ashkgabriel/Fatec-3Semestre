@@ -4,8 +4,10 @@ package View;
 import Controller.*;
 import Model.Estacionamento.MetricaCalculoEnum;
 import Model.Estacionamento.TipoVeiculoEnum;
+import java.io.File;
 import java.util.Calendar;
 import javax.swing.DefaultListModel;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -333,9 +335,19 @@ public class TelaPrincipal extends javax.swing.JFrame {
         jMenu1.setText("File");
 
         jMenuItem1.setText("Salvar");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
         jMenu1.add(jMenuItem1);
 
         jMenuItem2.setText("Abrir");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
         jMenu1.add(jMenuItem2);
 
         jMenuBar1.add(jMenu1);
@@ -388,8 +400,8 @@ public class TelaPrincipal extends javax.swing.JFrame {
     private void btoInicializarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btoInicializarActionPerformed
         
         try{
-                    
-            TipoVeiculoEnum tipoSelecionado = TipoVeiculoEnum.valueOf(cBoxTipoVeiculo.getSelectedItem().toString());
+        
+          TipoVeiculoEnum tipoSelecionado = TipoVeiculoEnum.valueOf(cBoxTipoVeiculo.getSelectedItem().toString());
 
             controle.addContaVeiculo(txtbNomeVeiculo.getText(), txtbPlacaVeiculoEntrada.getText(), tipoSelecionado);
             atualizaListaVeiculos();
@@ -422,9 +434,8 @@ public class TelaPrincipal extends javax.swing.JFrame {
         } else if (periodoPermanencia > 60) {
             txtbPeriodoPermanencia.setText(Long.toString(periodoPermanencia / 60) + " Horas");
         } else if (periodoPermanencia >= 60*24) {
-            txtbPeriodoPermanencia.setText(Long.toString(periodoPermanencia / (60 * 24)) + " Dias");
+            txtbPeriodoPermanencia.setText(Long.toString(periodoPermanencia / (60 * 12)) + " Diárias");
         }
-        
     }//GEN-LAST:event_cboxVeiculosActionPerformed
 
     private void cboxMetricaCalculoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboxMetricaCalculoActionPerformed
@@ -437,6 +448,38 @@ public class TelaPrincipal extends javax.swing.JFrame {
             txtbValorEstacionamento.setText(controle.calculaValorEstacionamento(metricaSelecionada, veiculoSelectedItem.toString()));
         }
     }//GEN-LAST:event_cboxMetricaCalculoActionPerformed
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+            String filename = File.separator;
+            JFileChooser fc = new JFileChooser(new File(filename));
+            fc.showSaveDialog(jPanel1);
+            File selFile= fc.getSelectedFile();
+         //Salva o arquivo 
+        try {
+            
+            controle.salvar(selFile.getAbsolutePath());
+            JOptionPane.showMessageDialog(rootPane, "Salvo!");
+            
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        String filename = File.separator;
+        JFileChooser fc = new JFileChooser(new File(filename));
+        fc.showOpenDialog(jPanel1);
+        File selFile= fc.getSelectedFile();            
+        try {
+            controle.ler(selFile.getAbsolutePath());
+            JOptionPane.showMessageDialog(rootPane, "Carregado!");
+            atualizaListaVeiculos();
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e.getMessage());
+        }
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     
 
