@@ -3,7 +3,9 @@ package Controller;
 
 import Model.DAO.*;
 import Model.Estacionamento.*;
+import static Model.Estacionamento.MetricaCalculoEnum.*;
 import View.TelaPrincipal;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -48,12 +50,19 @@ public class Controlador {
         //Finaliza a conta, utilizando a metrica de calculo recebida como paramentro.
         // Se a metrica for AUTOMATICO, o sistema deverá verificar a opção mais barata e utiliza-la
         
+        
         // Altera o status para fechado e salva o registro.
+        for (int i = 0; i < listaVeiculos.size(); i++) {
+            if (placaVeiculo.equals(listaVeiculos.get(i).getVeiculo().getPlaca())) {
+                listaVeiculos.get(i).setStatus(StatusConta.FECHADO);
+            }
+        }    
         //Se valor da conta for zero retorna um erro.
         
         //Se não for possivel registra no BD, salve um backup local da listaVeiculos;
         //Utilize o objeto DAO
        
+        
         
         
     }
@@ -101,6 +110,9 @@ public class Controlador {
                     
                     resultado = String.valueOf(valorCalculado);
                     break;
+                case AUTOMATICO:
+                    resultado = calculaAutomatico(placa);
+                    break;
                 default:
                     // Caso padrão, talvez lançar uma exceção ou lidar de outra forma com métricas desconhecidas
                     break;
@@ -110,7 +122,23 @@ public class Controlador {
     return resultado;
     }
     
-}    
+    private String calculaAutomatico(String placa){
+        long permanencia = calculaPermanencia(placa);
+        
+        if (permanencia < (60 * 60 * 1000)) {
+            return calculaValorEstacionamento(UM_QUARTO_HORA, placa);
+        } else if (permanencia >= (60 * 60 * 1000) && permanencia < (12 * 60 * 60 * 1000)) {
+            return calculaValorEstacionamento(HORA, placa);
+        } else return calculaValorEstacionamento(DIARIA, placa);
+        
+    }
     
-    
+    public void salvar(String caminho)throws IOException {
 
+        Serializador.gravar(caminho, listaVeiculos);
+    }      
+
+    public void ler(String caminho) throws ClassNotFoundException,IOException{
+        listaVeiculos = (List<ContaVeiculo>)Serializador.ler(caminho);
+    }
+}    
